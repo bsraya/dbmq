@@ -34,27 +34,30 @@ func (post *Post) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// read the json file sent by users
 	var received Student
 	json.NewDecoder(r.Body).Decode(&received)
+
+	// reject the request if the received data is empty
 	if received == (Student{}) {
 		post.logger.Println("Received empty data")
 		return
-	} else {
-		post.logger.Println("Received data: ", received)
 	}
 
-	// store students to Mongodb
+	post.logger.Println("Received data: ", received)
+
+	// access "model" collection in "vodascheduler" database
 	collection := post.MongoClient.Database("vodascheduler").Collection("model")
 	filter := bson.M{"id": received.ID}
-	var result Student
+	var found Student
 
-	// Find instance and decode the found result in result variable.
-	err := collection.FindOne(context.TODO(), filter).Decode(&result)
+	// Find instance and decode the found result into the "found" variable.
+	collection.FindOne(context.TODO(), filter).Decode(&found)
 
-	if err == mongo.ErrNoDocuments {
-		// If a student does not exist, insert his/her data into the database
+	if received.ID != found.ID { // Student IDs should be unique
+		// If a student ID doesn't exist, insert his/her data into the database
 		collection.InsertOne(context.TODO(), received)
 		post.logger.Println("Successfully inserted student:", received)
 	} else {
-		post.logger.Println("Instance already exist")
+		// else reject the request
+		post.logger.Println("Student ID already exists")
 		return
 	}
 

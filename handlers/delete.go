@@ -12,8 +12,6 @@ type Delete struct {
 	MongoClient *mongo.Client
 }
 
-// http://localhost:10000/post/ udah bisa diakses
-
 func NewDelete(logger *log.Logger, mongoClient *mongo.Client) *Delete {
 	return &Delete{logger, mongoClient}
 }
