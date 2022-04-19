@@ -28,7 +28,8 @@ func NewPost(logger *log.Logger, mongoClient *mongo.Client) *Post {
 
 func (post *Post) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	post.logger.Println("Received request for 'POST'")
-	w.WriteHeader(http.StatusOK) // send 200 OK
+	w.WriteHeader(http.StatusOK) // 200 OK
+	w.Write([]byte("Received request for 'POST'"))
 
 	// read the json file sent by users
 	var received Student
@@ -54,7 +55,9 @@ func (post *Post) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		post.logger.Println("Successfully inserted student:", received)
 	} else {
 		post.logger.Println("Instance already exist")
+		return
 	}
 
-	w.Write([]byte("Received request for 'POST'"))
+	post.logger.Println("The end of 'POST' request")
+	w.Write([]byte("The end of 'POST' request"))
 }

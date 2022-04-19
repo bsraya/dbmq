@@ -41,30 +41,18 @@ func connectMongo(url string) *mongo.Client {
 // 	return conn
 // }
 
-// curl http://localhost:10000/post/ simpan di database
-// curl http://localhost:10000/get/ dapatkan dari database
-// curl http://localhost:10000/delete/ hapus dari database
-
 func main() {
 	// connect to mongodb
 	mongoClient := connectMongo(mongoURL)
 	defer mongoClient.Disconnect(context.TODO())
 	fmt.Println("Connected to MongoDB")
 
-	logger := log.New(os.Stdout, "vodascheduler", log.LstdFlags)
-
-	postHandler := handlers.NewPost(logger, mongoClient)
-	getHandler := handlers.NewGet(logger, mongoClient)
-	deleteHandler := handlers.NewDelete(logger, mongoClient)
-
-	// /post -> http://localhost:10000/post/
-	// /get -> http://localhost:10000/get/
-	// /delete -> http://localhost:10000/delete/
+	logger := log.New(os.Stdout, "vodascheduler ", log.LstdFlags)
 
 	serveMux := http.NewServeMux()
-	serveMux.Handle("/post/", postHandler)
-	serveMux.Handle("/get/", getHandler)
-	serveMux.Handle("/delete/", deleteHandler)
+	serveMux.Handle("/post/", handlers.NewPost(logger, mongoClient))
+	serveMux.Handle("/get/", handlers.NewGet(logger, mongoClient))
+	serveMux.Handle("/delete/", handlers.NewDelete(logger, mongoClient))
 
 	server := &http.Server{
 		Addr:         ":9090",
@@ -73,8 +61,6 @@ func main() {
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
 	}
-
-	// curl -d "id=1&name=Tukul" -H "Content-Type: application/x-www-form-urlencoded" -X POST http://localhost:9090/post/
 
 	go func() {
 		err := server.ListenAndServe()
@@ -91,23 +77,6 @@ func main() {
 
 	tc, _ := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	server.Shutdown(tc)
-
-	// // store students to Mongodb
-	// collection := mongoClient.Database("vodascheduler").Collection("model")
-	// for _, student := range students {
-	// 	// check if student already exists
-	// 	filter := bson.M{"id": student.ID}
-	// 	var result Student
-	// 	err := collection.FindOne(context.TODO(), filter).Decode(&result)
-	// 	if err == mongo.ErrNoDocuments {
-	// 		// student does not exist, insert
-	// 		collection.InsertOne(context.TODO(), student)
-	// 		fmt.Println("Successfully inserted student:", student)
-	// 	} else {
-	// 		fmt.Println("Instance already exist")
-	// 		continue
-	// 	}
-	// }
 
 	// // connect to RabbitMQ
 	// rmqConnection := connectRabbitMQ(rabbitURL)
