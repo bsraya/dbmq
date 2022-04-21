@@ -15,7 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const mongoURL string = "mongodb://localhost:27017"
+const mongoURL string = "mongodb://mongo:27017/"
 
 func connectMongo(url string) *mongo.Client {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(url))

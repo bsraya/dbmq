@@ -6,6 +6,9 @@ ADD . /app
 
 WORKDIR /app
 
+# get git
+RUN apk add --no-cache git
+
 RUN go get -d -v ./...
 
 EXPOSE 9090

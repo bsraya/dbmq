@@ -4,27 +4,11 @@ services:
   mongo:
     image: mongo:latest
     container_name: mongo
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=vodadb
-      - MONGO_INITDB_ROOT_PASSWORD=vodadb
-      - MONGO_INITDB_DATABASE=vodascheduler
     volumes:
       - ./mongo-volume:/data/db
     ports:
-      - 27017:27017
-  mongo-express:
-    image: mongo-express:latest
-    container_name: mongo-express
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=vodadb
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=vodadb
-      - ME_CONFIG_MONGODB_URL=mongodb://vodadb:vodadb@mongo:27017/
-    volumes:
-      - ./mongo-volume:/data/db
-    ports:
-      - 8081:8081
-    depends_on:
-      - mongo
+      - 27011:27017
+    restart: always
   app:
     container_name: api
     build: .
