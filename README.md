@@ -29,7 +29,9 @@ docker compose down # to remove
 docker rmi dbmq_app # to remove the image for dbmq
 ```
 
-If you are not sure, run `docker images -a`. You should run `docker rmi dbmq_app` if you make some changes in `main.go` or in any of the files in `handlers`. If you don't remove, the new changes won't be included in the image. You can imagine a docker image is like an ISO to install a certain Linux distro.
+If you are not sure what to delete or it says `image not found`, run `docker images -a` to list all the existing images. 
+
+You should run `docker rmi dbmq_app` if you make some changes in `main.go` or in any of the files in `handlers`. If you don't remove, the new changes won't be included in the image. You can imagine a docker image is like an ISO to install a certain Linux distribution like Ubuntu.
 
 Once those two containers are up and running, open MongoDB Compass. If you want to connect to your MongoDB database, you need to type this URL in the URL field and press connect.
 
