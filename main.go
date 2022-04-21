@@ -17,8 +17,6 @@ import (
 
 const mongoURL string = "mongodb://localhost:27017"
 
-// const rabbitURL string = "amqp://guest:guest@localhost:5672"
-
 func connectMongo(url string) *mongo.Client {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(url))
 
@@ -29,17 +27,6 @@ func connectMongo(url string) *mongo.Client {
 
 	return client
 }
-
-// func connectRabbitMQ(url string) *amqp.Connection {
-// 	conn, err := amqp.Dial(url)
-
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		panic(err)
-// 	}
-
-// 	return conn
-// }
 
 func main() {
 	// connect to mongodb
@@ -58,8 +45,8 @@ func main() {
 		Addr:         ":9090",
 		Handler:      serveMux,
 		IdleTimeout:  120 * time.Second,
-		ReadTimeout:  1 * time.Second,
-		WriteTimeout: 1 * time.Second,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 5 * time.Second,
 	}
 
 	go func() {
@@ -77,11 +64,6 @@ func main() {
 
 	tc, _ := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	server.Shutdown(tc)
-
-	// // connect to RabbitMQ
-	// rmqConnection := connectRabbitMQ(rabbitURL)
-	// defer rmqConnection.Close()
-	// fmt.Println("Connected to RabbitMQ")
 
 	// // create channel
 	// channel, err := rmqConnection.Channel()
