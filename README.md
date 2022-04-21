@@ -2,7 +2,7 @@
 
 ## Tools
 1. Docker Desktop \
-   [Download Docker Desktop here](https://docs.docker.com/desktop/mac/install/)
+   [Download Docker Desktop here](https://docs.docker.com/desktop/mac/install/).
    If you are using M1 chip, click the one with `Mac with Apple chip`
 2. Docker Compose \
    Open your Docker Desktop and click `Setting`. In the `Setting`, check `Use Docker Compose V2`.
