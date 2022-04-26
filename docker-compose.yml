@@ -7,12 +7,16 @@ services:
     volumes:
       - ./mongo-volume:/data/db
     ports:
-      - 27011:27017
-    restart: always
+      - 27017:27017
+    command: mongod --quiet --logpath /dev/null
   app:
     container_name: api
-    build: .
+    build:
+      context: .
+      dockerfile: .Dockerfile
     ports:
       - 9090:9090
     depends_on:
       - mongo
+    volumes:
+      - .:/app

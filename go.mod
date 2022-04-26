@@ -3,7 +3,6 @@ module mqdb
 go 1.17
 
 require (
-	github.com/streadway/amqp v1.0.0
 	go.mongodb.org/mongo-driver v1.9.0
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 )

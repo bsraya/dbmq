@@ -10,10 +10,18 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// const rabbitURL string = "amqp://guest:guest@localhost:5672"
+
 type Post struct {
-	logger      *log.Logger
+	Logger      *log.Logger
 	MongoClient *mongo.Client
 }
+
+// type Post struct {
+// 	Logger       *log.Logger
+// 	MongoClient  *mongo.Client
+// 	RabbitCLient *amqp.Connection
+// }
 
 type Student struct {
 	ID   int    `json:"id"`
@@ -26,8 +34,12 @@ func NewPost(logger *log.Logger, mongoClient *mongo.Client) *Post {
 	return &Post{logger, mongoClient}
 }
 
+// func NewPost(logger *log.Logger, mongoClient *mongo.Client, rabbitClient *amqp.Connection) *Post {
+// 	return &Post{logger, mongoClient, rabbitClient}
+// }
+
 func (post *Post) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	post.logger.Println("Received request for 'POST'")
+	post.Logger.Println("Received request for 'POST'")
 	w.WriteHeader(http.StatusOK) // 200 OK
 	w.Write([]byte("Received request for 'POST'"))
 
@@ -37,14 +49,19 @@ func (post *Post) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// reject the request if the received data is empty
 	if received == (Student{}) {
-		post.logger.Println("Received empty data")
+		post.Logger.Println("Received empty data")
 		return
 	}
 
-	post.logger.Println("Received data: ", received)
+	post.Logger.Println("Received data: ", received)
 
 	// access "model" collection in "vodascheduler" database
 	collection := post.MongoClient.Database("vodascheduler").Collection("model")
+	if collection == nil {
+		post.Logger.Println("Collection not found")
+		return
+	}
+
 	filter := bson.M{"id": received.ID}
 	var found Student
 
@@ -54,13 +71,14 @@ func (post *Post) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if received.ID != found.ID { // Student IDs should be unique
 		// If a student ID doesn't exist, insert his/her data into the database
 		collection.InsertOne(context.TODO(), received)
-		post.logger.Println("Successfully inserted student:", received)
+		post.Logger.Println("Successfully inserted student:", received)
 	} else {
 		// else reject the request
-		post.logger.Println("Student ID already exists")
+		post.Logger.Println("Student ID already exists")
+		post.Logger.Println("The end of 'POST' request")
 		return
 	}
 
-	post.logger.Println("The end of 'POST' request")
+	post.Logger.Println("The end of 'POST' request")
 	w.Write([]byte("The end of 'POST' request"))
 }

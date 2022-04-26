@@ -15,7 +15,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const mongoURL string = "mongodb://mongo:27017/"
+const mongoURL string = "mongodb://mongo:27017"
+
+// const rabbitURL string = "amqp://guest:guest@rabbitmq:5672"
 
 func connectMongo(url string) *mongo.Client {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(url))
@@ -28,11 +30,25 @@ func connectMongo(url string) *mongo.Client {
 	return client
 }
 
+// func connectRabbitMQ(url string) *amqp.Connection {
+// 	conn, err := amqp.Dial(url)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		panic(err)
+// 	}
+
+// 	return conn
+// }
+
 func main() {
 	// connect to mongodb
 	mongoClient := connectMongo(mongoURL)
 	defer mongoClient.Disconnect(context.TODO())
 	fmt.Println("Connected to MongoDB")
+
+	// rabbitClient := connectRabbitMQ(rabbitURL)
+	// defer rabbitClient.Close()
+	// fmt.Println("Connected to RabbitMQ")
 
 	logger := log.New(os.Stdout, "vodascheduler ", log.LstdFlags)
 
@@ -40,6 +56,9 @@ func main() {
 	serveMux.Handle("/post/", handlers.NewPost(logger, mongoClient))
 	serveMux.Handle("/get/", handlers.NewGet(logger, mongoClient))
 	serveMux.Handle("/delete/", handlers.NewDelete(logger, mongoClient))
+	// serveMux.Handle("/post/", handlers.NewPost(logger, mongoClient, rabbitClient))
+	// serveMux.Handle("/get/", handlers.NewGet(logger, mongoClient, rabbitClient))
+	// serveMux.Handle("/delete/", handlers.NewDelete(logger, mongoClient, rabbitClient))
 
 	server := &http.Server{
 		Addr:         ":9090",
