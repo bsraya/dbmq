@@ -1,18 +1,27 @@
 FROM golang:1.18-alpine
 
-RUN mkdir /app
+ENV GO111MODULE=on \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64
 
-ADD . /app
+# Add required packages
+RUN apk add --update git curl bash
 
 WORKDIR /app
 
-# get git
-RUN apk add --no-cache git
+COPY go.mod go.sum ./
 
-RUN go get -d -v ./...
+RUN go mod download
 
+# Copy app files
+COPY main.go handlers ./
+
+# Install Reflex for development
+RUN go install github.com/cespare/reflex@latest
+
+# Expose port
 EXPOSE 9090
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o main .
-
-CMD ["./main"]
+# Start app
+CMD reflex -r '\.go' -s -- sh -c "go run main.go"
